@@ -129,8 +129,8 @@ class ScheduledTimeMixin(models.Model):
 class ScheduledJob(ScheduledTimeMixin, BaseJob):
 
     class Meta:
-        verbose_name = _('Запланированная задача')
-        verbose_name_plural = _('Запланированные задачи')
+        verbose_name = _('запланированная задача')
+        verbose_name_plural = _('запланированные задачи')
         ordering = ('name', )
 
 
@@ -174,8 +174,8 @@ class RepeatableJob(ScheduledTimeMixin, BaseJob):
         return True
 
     class Meta:
-        verbose_name = _('Повторяемая задача')
-        verbose_name_plural = _('Повторяемые задачи')
+        verbose_name = _('повторяемая задача')
+        verbose_name_plural = _('повторяемые задачи')
         ordering = ('name', )
 
 
@@ -215,6 +215,6 @@ class CronJob(BaseJob):
         return True
 
     class Meta:
-        verbose_name = _('Cron-задача')
-        verbose_name_plural = _('Cron-задачи')
+        verbose_name = _('cron-задача')
+        verbose_name_plural = _('cron-задачи')
         ordering = ('name', )

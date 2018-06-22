@@ -54,7 +54,7 @@ class ScheduledJobAdmin(QueueMixin, admin.ModelAdmin):
                 'scheduled_time',
                 'timeout',
             ),
-            'description': _('Please be aware: Scheduled Time has to be in the future.'),
+            'description': _('Внимание: время запуска должно быть в будущем'),
         }),
     )
 
