@@ -7,5 +7,5 @@ class JobAdminForm(ModelForm):
     def clean_scheduled_time(self):
         data = self.cleaned_data['scheduled_time']
         if data < now():
-            raise ValidationError("Scheduled time has to be in the future")
+            raise ValidationError("Запланированное время должно быть в будущем")
         return data

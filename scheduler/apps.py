@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 
 class SchedulerConfig(AppConfig):
     name = 'scheduler'
-    verbose_name = _('Django RQ Scheduler')
+    verbose_name = _('Планировщик задач')
 
     def ready(self):
         try:

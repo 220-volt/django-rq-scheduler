@@ -19,18 +19,17 @@ from model_utils.models import TimeStampedModel
 @python_2_unicode_compatible
 class BaseJob(TimeStampedModel):
 
-    name = models.CharField(_('name'), max_length=128, unique=True)
-    callable = models.CharField(_('callable'), max_length=2048)
-    enabled = models.BooleanField(_('enabled'), default=True)
-    queue = models.CharField(_('queue'), max_length=16)
+    name = models.CharField(_('название'), max_length=128, unique=True)
+    callable = models.CharField(_('функция'), max_length=2048)
+    enabled = models.BooleanField(_('активирована'), default=True)
+    queue = models.CharField(_('очередь'), max_length=16)
     job_id = models.CharField(
-        _('job id'), max_length=128, editable=False, blank=True, null=True)
+        _('id'), max_length=128, editable=False, blank=True, null=True)
     timeout = models.IntegerField(
-        _('timeout'), blank=True, null=True,
+        _('таймаут'), blank=True, null=True,
         help_text=_(
-            'Timeout specifies the maximum runtime, in seconds, for the job '
-            'before it\'ll be considered \'lost\'. Blank uses the default '
-            'timeout.'
+            'Таймаут определяет максимальное время выполнения задачи,'
+            'при привышении которого задача будет отменена'
         )
     )
 
@@ -42,7 +41,7 @@ class BaseJob(TimeStampedModel):
         module = importlib.import_module('.'.join(path[:-1]))
         func = getattr(module, path[-1])
         if callable(func) is False:
-            raise TypeError("'{}' is not callable".format(self.callable))
+            raise TypeError("'{}' не является callable-объектом".format(self.callable))
         return func
 
     def clean(self):
@@ -55,7 +54,7 @@ class BaseJob(TimeStampedModel):
         except:
             raise ValidationError({
                 'callable': ValidationError(
-                    _('Invalid callable, must be importable'), code='invalid')
+                    _('Неимпортируемый объект'), code='invalid')
             })
 
     def clean_queue(self):
@@ -63,13 +62,13 @@ class BaseJob(TimeStampedModel):
         if self.queue not in queue_keys:
             raise ValidationError({
                 'queue': ValidationError(
-                    _('Invalid queue, must be one of: {}'.format(
+                    _('Неправильная очередь, выберите из: {}'.format(
                         ', '.join(queue_keys))), code='invalid')
             })
 
     def is_scheduled(self):
         return self.job_id in self.scheduler()
-    is_scheduled.short_description = _('is scheduled?')
+    is_scheduled.short_description = _('запланирована?')
     is_scheduled.boolean = True
 
     def save(self, **kwargs):
@@ -118,7 +117,7 @@ class BaseJob(TimeStampedModel):
 
 class ScheduledTimeMixin(models.Model):
 
-    scheduled_time = models.DateTimeField(_('scheduled time'))
+    scheduled_time = models.DateTimeField(_('запланированное время'))
 
     def schedule_time_utc(self):
         return utc(self.scheduled_time)
@@ -130,25 +129,25 @@ class ScheduledTimeMixin(models.Model):
 class ScheduledJob(ScheduledTimeMixin, BaseJob):
 
     class Meta:
-        verbose_name = _('Scheduled Job')
-        verbose_name_plural = _('Scheduled Jobs')
+        verbose_name = _('Запланированная задача')
+        verbose_name_plural = _('Запланированные задачи')
         ordering = ('name', )
 
 
 class RepeatableJob(ScheduledTimeMixin, BaseJob):
 
     UNITS = Choices(
-        ('minutes', _('minutes')),
-        ('hours', _('hours')),
-        ('days', _('days')),
-        ('weeks', _('weeks')),
+        ('minutes', _('минут')),
+        ('hours', _('часов')),
+        ('days', _('дней')),
+        ('weeks', _('недель')),
     )
 
-    interval = models.PositiveIntegerField(_('interval'))
+    interval = models.PositiveIntegerField(_('периодичность'))
     interval_unit = models.CharField(
-        _('interval unit'), max_length=12, choices=UNITS, default=UNITS.hours
+        _('тип значения периодичности'), max_length=12, choices=UNITS, default=UNITS.hours
     )
-    repeat = models.PositiveIntegerField(_('repeat'), blank=True, null=True)
+    repeat = models.PositiveIntegerField(_('Количество повторов'), blank=True, null=True, help_text='Оставьте поле пустым для бесконечного количества повторов')
 
     def interval_display(self):
         return '{} {}'.format(self.interval, self.get_interval_unit_display())
@@ -175,18 +174,18 @@ class RepeatableJob(ScheduledTimeMixin, BaseJob):
         return True
 
     class Meta:
-        verbose_name = _('Repeatable Job')
-        verbose_name_plural = _('Repeatable Jobs')
+        verbose_name = _('Повторяемая задача')
+        verbose_name_plural = _('Повторяемые задачи')
         ordering = ('name', )
 
 
 class CronJob(BaseJob):
 
     cron_string = models.CharField(
-        _('cron string'), max_length=64,
-        help_text=_('Define the schedule in a crontab like syntax.')
+        _('Cron-строка'), max_length=64,
+        help_text=_('Определите периодичность в синтаксисе crontab-файла.')
     )
-    repeat = models.PositiveIntegerField(_('repeat'), blank=True, null=True)
+    repeat = models.PositiveIntegerField(_('Количество повторов'), blank=True, null=True, help_text='Оставьте поле пустым для бесконечного количества повторов')
 
     def clean(self):
         super(CronJob, self).clean()
@@ -216,6 +215,6 @@ class CronJob(BaseJob):
         return True
 
     class Meta:
-        verbose_name = _('Cron Job')
-        verbose_name_plural = _('Cron Jobs')
+        verbose_name = _('Cron-задача')
+        verbose_name_plural = _('Cron-задачи')
         ordering = ('name', )

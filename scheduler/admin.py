@@ -31,7 +31,7 @@ class QueueMixin(object):
                 o.delete()
         else:
             obj.delete()
-    delete_model.short_description = _("Delete selected %(verbose_name_plural)s")
+    delete_model.short_description = _("Удалить выбранные %(verbose_name_plural)s")
 
 
 @admin.register(ScheduledJob)
@@ -46,10 +46,10 @@ class ScheduledJobAdmin(QueueMixin, admin.ModelAdmin):
         (None, {
             'fields': ('name', 'callable', 'enabled', ),
         }),
-        (_('RQ Settings'), {
+        (_('Настройки'), {
             'fields': ('queue', 'job_id', ),
         }),
-        (_('Scheduling'), {
+        (_('Планирование'), {
             'fields': (
                 'scheduled_time',
                 'timeout',
@@ -72,17 +72,17 @@ class RepeatableJobAdmin(QueueMixin, admin.ModelAdmin):
         (None, {
             'fields': ('name', 'callable', 'enabled', ),
         }),
-        (_('RQ Settings'), {
+        (_('Настройки'), {
             'fields': ('queue', 'job_id', ),
         }),
-        (_('Scheduling'), {
+        (_('Планирование'), {
             'fields': (
                 'scheduled_time',
                 ('interval', 'interval_unit', ),
                 'repeat',
                 'timeout',
             ),
-            'description': _('Please be aware: Scheduled Time has to be in the future.'),
+            'description': _('Внимание: время запуска должно быть в будущем'),
         }),
     )
 
@@ -99,10 +99,10 @@ class CronJobAdmin(QueueMixin, admin.ModelAdmin):
         (None, {
             'fields': ('name', 'callable', 'enabled', ),
         }),
-        (_('RQ Settings'), {
+        (_('Настройки'), {
             'fields': ('queue', 'job_id', ),
         }),
-        (_('Scheduling'), {
+        (_('Планирование'), {
             'fields': (
                 'cron_string',
                 'repeat',
